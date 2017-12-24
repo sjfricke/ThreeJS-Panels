@@ -1,67 +1,61 @@
-var mainScreen, sideScreen1, sideScreen2, sideScreen3, sideScreen4;
-var startX = 18.234159;
-var startY = -66.4369742;
-const MIN_ZOOM = 9;
-const PIC_SIZE = 512;
+var mainScreen, sideScreen1, sideScreen2, sideScreen3;
 
 function init() {
 
-    screen0 = new Screen(0, {
+    screen0 = new Screen( 0, {
         "div" : document.getElementById("mainScreen"), 
         "expandOff" : true
     });
-    screen1 = new Screen(1, {
+    screen1 = new Screen( 1, {
         "div" : document.getElementById("sideScreen1"),
          "cameraZ" : 600 
      });
-    screen2 = new Screen(2, {
+    screen2 = new Screen( 2, {
         "div" : document.getElementById("sideScreen2")
     });
-    screen3 = new Screen(3, {
+    screen3 = new Screen( 3, {
         "div" : document.getElementById("sideScreen3")
     });
-    screen4 = new Screen(4, {
-        "div" : document.getElementById("sideScreen4")
-    });
-   
-    var textureStart = new THREE.TextureLoader().load( '../textures/start_rico.png' );
-    var geometryStart = new THREE.SphereGeometry( 200, 128, 128 );
-    var materialStart = new THREE.MeshBasicMaterial( { map: textureStart } );
-    screen0.globe = new THREE.Mesh( geometryStart, materialStart );
+
+    var texture = new THREE.TextureLoader().load( '../textures/earth.jpg' );
+    var geometry = new THREE.SphereGeometry( 200, 128, 128 );
+    var material = new THREE.MeshBasicMaterial( { map: texture } );
+    screen0.globe = new THREE.Mesh( geometry, material );
     screen0.add( screen0.globe );
 
-    var textureEarth = new THREE.TextureLoader().load( '../textures/earth.jpg' );
-    var geometryEarth = new THREE.SphereGeometry( 200, 128, 128 );
-    var materialEarth = new THREE.MeshBasicMaterial( { map: textureEarth } );
-    var meshEarth = new THREE.Mesh( geometryEarth, materialEarth );
-    screen1.add( meshEarth );
+    geometry = new THREE.TorusGeometry( 150, 20, 8, 32 );
+    material = new THREE.MeshBasicMaterial( {color: 0x0000FF} );
+    screen1.ring = new THREE.Mesh( geometry, material );
+    screen1.add( screen1.ring );
 
-    var geometry = new THREE.BoxGeometry( 200, 100, 100 );
-    var material = new THREE.MeshBasicMaterial( {color: 0x00FF00} );
-    var cube = new THREE.Mesh( geometry, material );
-    screen2.add( cube );
+    geometry = new THREE.SphereBufferGeometry( 150, 16, 16  );
+    var wireframe = new THREE.WireframeGeometry( geometry );
+    screen2.line = new THREE.LineSegments( wireframe );
+    screen2.line.material.depthTest = false;
+    screen2.line.material.opacity = 0.25;
+    screen2.line.material.transparent = true;
+    screen2.add( screen2.line );
 
-    var geometry = new THREE.BoxGeometry( 200, 200, 200 );
-    var material = new THREE.MeshBasicMaterial( {color: 0xFF0000} );
-    var cube = new THREE.Mesh( geometry, material );
-    screen3.add( cube );
-
-    var geometry = new THREE.BoxGeometry( 200, 200, 100 );
-    var material = new THREE.MeshLambertMaterial( {color: 0x00FFFF} );
-    var cube = new THREE.Mesh( geometry, material );
-    var directionalLight1 = new THREE.DirectionalLight( 0xffffff, 0.5 );
-    var directionalLight2 = new THREE.DirectionalLight( 0xffffff, 0.5 );
+    geometry = new THREE.BoxGeometry( 200, 200, 100 );
+    material = new THREE.MeshLambertMaterial( {color: 0x00FFFF} );
+    screen3.box = new THREE.Mesh( geometry, material );
+    geometry = new THREE.PlaneGeometry( 400, 400 );
+    material = new THREE.MeshLambertMaterial( {color: 0xFFFFFF, side: THREE.DoubleSide}  );
+    mesh = new THREE.Mesh( geometry, material );
+    mesh.rotation.x = Math.PI / 2;
+    mesh.position.y = -150;
+    var directionalLight1 = new THREE.DirectionalLight( 0xFFFFFF, 0.5 );
+    var directionalLight2 = new THREE.DirectionalLight( 0xFFFFFF, 0.5 );
     directionalLight2.position.set( 1, 1, 1 );
-    screen4.add( cube );
-    screen4.add( directionalLight1 );
-    screen4.add( directionalLight2 );
-
+    screen3.add( screen3.box );
+    screen3.add( mesh );
+    screen3.add( directionalLight1 );
+    screen3.add( directionalLight2 );
 
     screen0.animate();
     screen1.animate();
     screen2.animate();
     screen3.animate();
-    screen4.animate();
 }
 
 function expandClick(index){
@@ -78,7 +72,6 @@ function expandClick(index){
         case 1: screen1.parentDiv.removeChild( screen1.renderer.domElement ); break;
         case 2: screen2.parentDiv.removeChild( screen2.renderer.domElement ); break;
         case 3: screen3.parentDiv.removeChild( screen3.renderer.domElement ); break;
-        case 4: screen4.parentDiv.removeChild( screen4.renderer.domElement ); break;
     }
 
     switch (tSwap) {
@@ -86,49 +79,36 @@ function expandClick(index){
         case 1: screen1.parentDiv.removeChild( screen1.renderer.domElement ); break;
         case 2: screen2.parentDiv.removeChild( screen2.renderer.domElement ); break;
         case 3: screen3.parentDiv.removeChild( screen3.renderer.domElement ); break;
-        case 4: screen4.parentDiv.removeChild( screen4.renderer.domElement ); break;
     }
 
     switch (tMain) {
         case 0: 
             screen0.parentDiv = (tSwap == 1 ? screen1.parentDiv :
                                 (tSwap == 2 ? screen2.parentDiv : 
-                                (tSwap == 3 ? screen3.parentDiv : 
-                                              screen4.parentDiv)));  
+                                              screen3.parentDiv ));  
             screen0.parentDiv.appendChild(screen0.renderer.domElement);
             screen0.onWindowResize();
             break;
         case 1: 
              screen1.parentDiv = (tSwap == 0 ? screen0.parentDiv :
                                  (tSwap == 2 ? screen2.parentDiv :
-                                 (tSwap == 3 ? screen3.parentDiv :
-                                               screen4.parentDiv)));
+                                               screen3.parentDiv ));
              screen1.parentDiv.appendChild(screen1.renderer.domElement)
              screen1.onWindowResize();
             break;
         case 2: 
              screen2.parentDiv = (tSwap == 0 ? screen0.parentDiv :
                                  (tSwap == 1 ? screen1.parentDiv :
-                                 (tSwap == 3 ? screen3.parentDiv :
-                                              screen4.parentDiv)));
+                                               screen3.parentDiv ));
              screen2.parentDiv.appendChild(screen2.renderer.domElement)
              screen2.onWindowResize();
             break;
         case 3: 
              screen3.parentDiv = (tSwap == 0 ? screen0.parentDiv :
                                  (tSwap == 1 ? screen1.parentDiv :
-                                 (tSwap == 2 ? screen2.parentDiv :
-                                               screen4.parentDiv)));
+                                               screen2.parentDiv ));
              screen3.parentDiv.appendChild(screen3.renderer.domElement)
              screen3.onWindowResize();
-            break;
-        case 4: 
-             screen4.parentDiv = (tSwap == 0 ? screen0.parentDiv :
-                                 (tSwap == 1 ? screen1.parentDiv :
-                                 (tSwap == 2 ? screen2.parentDiv :
-                                               screen3.parentDiv)));
-             screen4.parentDiv.appendChild(screen4.renderer.domElement)
-             screen4.onWindowResize();
             break;
     }
 
@@ -149,13 +129,8 @@ function expandClick(index){
                 screen3.parentDiv.appendChild( screen3.renderer.domElement)
                 screen3.onWindowResize();
                 break;
-        case 4: screen4.parentDiv =  document.getElementById("mainScreen");
-                screen4.parentDiv.appendChild( screen4.renderer.domElement)
-                screen4.onWindowResize();
-                break;
     }
 
     document.getElementById("mainScreen").renderId = tSwap;
-    document.getElementById("sideScreen"+index).renderId = tMain;
-    
+    document.getElementById("sideScreen"+index).renderId = tMain;    
 }

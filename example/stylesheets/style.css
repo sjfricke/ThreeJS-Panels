@@ -14,7 +14,7 @@ body {
 
 .sideScreen {
 	position: absolute;
-	height: 25%;
+	height: 33.333%;
 	width: 20%;
 	right: 0;
 }
@@ -24,15 +24,11 @@ body {
 }
 
 #sideScreen2 {
-	top: 25%;
+	top: 33.333%;
 }
 
 #sideScreen3 {
-	top: 50%;
-}
-
-#sideScreen4 {
-	top: 75%;
+	top: 66.667%;
 }
 
 .expandImg {

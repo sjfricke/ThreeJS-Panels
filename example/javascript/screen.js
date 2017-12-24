@@ -63,7 +63,6 @@ Screen.prototype.animate = function() {
 		case 1: this.animate1(); break;
 		case 2: this.animate2(); break;
 		case 3: this.animate3(); break;
-		case 4: this.animate4(); break;
 	}
 }
 
@@ -79,26 +78,31 @@ Screen.prototype.animate0 = function() {
 	this.render();
 };
 
-Screen.prototype.animate1 = function() {    
+Screen.prototype.animate1 = function() {
 	this.animationFrame = requestAnimationFrame( this.animate1 );
+
+	this.ring.rotation.y += 0.02;
+
 	this.controls.update();
 	this.render();
 };
 
 Screen.prototype.animate2 = function() {    
 	this.animationFrame = requestAnimationFrame( this.animate2 );
+
+	this.line.rotation.y -= 0.005;
+
 	this.controls.update();
 	this.render();
 };
 
 Screen.prototype.animate3 = function() {    
 	this.animationFrame = requestAnimationFrame( this.animate3 );
-	this.controls.update();
-	this.render();
-};
 
-Screen.prototype.animate4 = function() {    
-	this.animationFrame = requestAnimationFrame( this.animate4 );
+	this.box.rotation.x += 0.001;
+	this.box.rotation.y += 0.008;
+
+
 	this.controls.update();
 	this.render();
 };
@@ -110,21 +114,4 @@ Screen.prototype.render = function() {
 
 Screen.prototype.add = function(mesh){
   this.scene.add(mesh);
-};
-
-/**
- * Helper method to convert for LatLng to vertex.
- * @param  {google.maps.LatLng} latLng - The LatLng to convert.
- * @return {THREE.Vector3} The resulting vertex.
- */
-Screen.prototype.fromLatLngToVertex = function(latLng) {
-  var projection = this.map.getProjection(),
-    point = projection.fromLatLngToPoint(latLng),
-    vertex = new THREE.Vector3();
-
-  vertex.x = point.x;
-  vertex.y = 255 - point.y;
-  vertex.z = 0;
-
-  return vertex;
 };
